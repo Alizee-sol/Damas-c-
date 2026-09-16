@@ -51,12 +51,14 @@ void mostrarTablero()
         }
         cout << endl;
     }
-    //Letras para identificar celdas en X
+    //Números para identificar celdas en X
     cout << "   0  1  2  3  4  5  6  7";
 }
 
 void turno()
 {
+    //variable temporal para salir del ciclo
+    char res;
     bool win = false;
     //Jugador actual (comienza el blanco = o)
     char jugador = blanco;
@@ -71,12 +73,20 @@ void turno()
         {
             cout << "\n la ficha que elegiste no es tuya" << endl;
         }
+        else if (tablero[x][y] == libre)
+        {
+            cout << "\n La casilla que elegiste está vacía" << endl;
+        }
+
         cout << "Ingrese posicion de donde la moverá" << endl;
         cin >> xs >> ys;
+
+        //La posicion elegida ya tiene una ficha del mismo jugador
         if (tablero[xs][ys] == jugador)
         {
             cout << "\n la posicion que elegiste ya tiene una ficha tuya" << endl;
         }
+        //La posicion elegida esta libre
         else if (tablero[xs][ys] == libre)
         {
             //Inserta la ficha en el lugar libre
@@ -86,10 +96,11 @@ void turno()
             //Actualiza tablero
             mostrarTablero();
         }
-        else if (tablero[xs][ys] == negro)
+        //La posicion elegida tiene una ficha del jugador contrario
+        else if (tablero[xs][ys] != jugador && tablero[xs][ys] != libre)
         {
             //Elimina la ficha del jugador contrario
-            tablero[xs][ys] = blanco; 
+            tablero[xs][ys] = jugador; 
             //Agregamos la anotacion al jugador que comió dicha ficha
             if (jugador == blanco) 
             {
@@ -110,6 +121,19 @@ void turno()
         else 
         {
             jugador = blanco;
+        }
+
+        //Pregunta para rendirse y salir del ciclo while
+        cout << "\n ¿Prefieres rendirte? (s/n)" << endl;
+        cin >> res;
+        res = tolower(res);
+        if (res == 's') 
+        {
+            win = true;
+        } 
+        else 
+        {
+            win = false;
         }
 
     }
