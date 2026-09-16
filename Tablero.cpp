@@ -6,34 +6,43 @@ char tablero[8][8];
 char blanco = 'o';
 char negro = 'x';
 char libre = ' ';
+char limite = '-';
 //Contadores de captura
 int Captura_blanca, Captura_negra;
 
 
 void iniciaTablero()
 {
-    //Recorrido de filas
+    // Recorrido de filas
     for (int filas = 0; filas < 8; filas++)
     {
-        //Recorrido de columas (elementos)
+        // Recorrido de columnas (elementos)
         for (int ele = 0; ele < 8; ele++)
         {
-            //Fichas Negras en las primeras 3 filas
-            //Verifica que la casilla sea par
-            if (filas < 3 && (filas + ele) % 2 != 0)
+            //Casillas oscuras (donde si pueden moverse las fichas)
+            if ((filas + ele) % 2 != 0) 
             {
-                tablero[filas][ele] = negro;
+                //fichas Negras en las primeras 3 filas
+                if (filas < 3) 
+                {
+                    tablero[filas][ele] = negro;
+                }
+                //fichas Blancas en las ultimas 3 filas
+                else if (filas > 4) 
+                {
+                    tablero[filas][ele] = blanco;
+                }
+                //casillas sin usar
+                else 
+                {
+                    tablero[filas][ele] = libre;
+                }
             }
-            //Fichas Blancas en las últimas 3 filas
-            //Verifica que la casilla sea par
-            else if (filas > 4 && (filas + ele) % 2 != 0)
-            {
-                tablero[filas][ele] = blanco;
-            }
-            //Espacios vacíos (el resto)
+            //Si la suma es par, es una casilla "blanca" 
+            //(donde no pueden moverse las fichas)
             else 
             {
-                tablero[filas][ele] = libre;
+                tablero[filas][ele] = limite; 
             }
         }
     }
@@ -84,39 +93,39 @@ void turno()
     while (win == false) 
     {
         cout << "\n--- Turno del jugador: " << jugador << " ---" << endl;
-        cout << "Ingrese posicion de la ficha que va a mover (Fila Columna):" << endl;
+        cout << "Ingrese posicion de la ficha que va a mover (X [espacio] Y):" << endl;
         cin >> x >> y;
 
-        if (tablero[x][y] != jugador)
+        if (tablero[y][x] != jugador)
         {
             cout << "\nError: La ficha que elegiste no es tuya." << endl;
             //reinicia el ciclo en caso de error
             continue; 
         }
 
-        cout << "Ingrese posicion de donde la moverá (Fila Columna):" << endl;
+        cout << "Ingrese posicion de donde la moverá (X [espacio] Y):" << endl;
         cin >> xs >> ys;
 
         //La posicion elegida ya tiene una ficha del mismo jugador
-        if (tablero[xs][ys] == jugador)
+        if (tablero[ys][xs] == jugador)
         {
             cout << "\nError: La posicion que elegiste ya tiene una ficha tuya." << endl;
             continue;
         }
         //La posicion elegida esta libre
-        else if (tablero[xs][ys] == libre)
+        else if (tablero[ys][xs] == libre)
         {
-            tablero[xs][ys] = jugador;
-            tablero[x][y] = libre;
+            tablero[ys][xs] = jugador;
+            tablero[y][x] = libre;
             //Actualiza tablero
             mostrarTablero();
         }
         //La posicion elegida tiene una ficha del jugador contrario
-        else if (tablero[xs][ys] != jugador && tablero[xs][ys] != libre)
+        else if (tablero[ys][xs] != jugador && tablero[ys][xs] != libre)
         {
             //Elimina la ficha del jugador contrario
-            tablero[xs][ys] = jugador; 
-            tablero[x][y] = libre;
+            tablero[ys][xs] = jugador; 
+            tablero[y][x] = libre;
             
             if (jugador == blanco) 
             {
@@ -173,13 +182,11 @@ int main()
             iniciaTablero();
             mostrarTablero();
             turno();
-            evaluarGanador(); 
-            opc = 0;
+            evaluarGanador();
         }
-        else
+        else if (opc > 2 || opc < 1)
         {
-            cout << "Opción desconocida."; 
-            opc = 0;
+            cout << "Opción desconocida.";
         }
     } 
     cout << "\n Saliendo del juego...";
