@@ -1,7 +1,12 @@
 #include <iostream>
+//Para la función abs()
+#include <cmath>
+//Para la función tolower()
+#include <cctype>
+
 using namespace std;
 
-//Declaracion global del array tablero (8*8 lugares) tipo char
+// Declaración global del array tablero (8*8 lugares)
 char tablero[8][8];
 char blanco = 'o';
 char negro = 'x';
@@ -10,10 +15,16 @@ char limite = '-';
 //Contadores de captura
 int Captura_blanca, Captura_negra;
 
+bool evaluarGanador();
+void mostrarTablero();
 
 void iniciaTablero()
 {
-    // Recorrido de filas
+    //Reiniciar contadores en caso de jugar una segunda partida
+    Captura_blanca = 0;
+    Captura_negra = 0;
+
+    //Recorrido de filas
     for (int filas = 0; filas < 8; filas++)
     {
         // Recorrido de columnas (elementos)
@@ -47,6 +58,7 @@ void iniciaTablero()
         }
     }
 }
+
 void mostrarTablero() 
 {  
     //Recorrido de filas para mostrar número en Y
@@ -61,9 +73,10 @@ void mostrarTablero()
         cout << endl;
     }
     //Números para identificar celdas en X
-    cout << "   0  1  2  3  4  5  6  7";
+    cout << "   0  1  2  3  4  5  6  7" << endl;
+    cout << "Puntos - Blanco(o): " << Captura_blanca << " | Negro(x): " << Captura_negra << endl;
 }
-//Bool para que retorne true o false
+
 bool evaluarGanador()
 {
     if(Captura_blanca == 12)
@@ -76,7 +89,31 @@ bool evaluarGanador()
         cout << "\n¡El jugador NEGRO ha ganado por capturas!" << endl;
         return true;
     }
-    //Aún no hay ganador
+    return false; 
+}
+
+//verifica si hay un salto disponible
+bool tieneSaltoDisponible(int x, int y, char jugador)
+{
+    int dirY = (jugador == blanco) ? -1 : 1;
+    char oponente = (jugador == blanco) ? negro : blanco;
+    int saltosX[2] = {-2, 2}; 
+    
+    for (int i = 0; i < 2; i++) 
+    {
+        int destX = x + saltosX[i];
+        int destY = y + (dirY * 2);
+        int enemigoX = x + (saltosX[i] / 2);
+        int enemigoY = y + dirY;
+
+        if (destX >= 0 && destX < 8 && destY >= 0 && destY < 8) 
+        {
+            if (tablero[enemigoY][enemigoX] == oponente && tablero[destY][destX] == libre) 
+            {
+                return true; 
+            }
+        }
+    }
     return false; 
 }
 
@@ -89,88 +126,126 @@ void turno()
     char jugador = blanco;
     //x, y = Origen // xs, ys = destino
     int x = 0, y = 0, xs = 0, ys = 0;
+    bool turnoExtra = false;
     
     while (win == false) 
     {
         cout << "\n+---+---+ Turno del jugador: " << jugador << " +---+---+" << endl;
-        cout << "Ingrese posicion de la ficha que va a mover (X [espacio] Y):" << endl;
-        cin >> x >> y;
+        
+        if (turnoExtra == false) 
+        {
+            cout << "Ingrese posicion de la ficha que va a mover (X [espacio] Y):" << endl;
+            cin >> x >> y;
 
-        if (tablero[y][x] != jugador)
-        {
-            cout << "\nError: La ficha que elegiste no es tuya." << endl;
-            //reinicia el ciclo en caso de error
-            continue; 
-        }
-
-        cout << "Ingrese posicion de donde la moverá (X [espacio] Y):" << endl;
-        cin >> xs >> ys;
-
-        //La posicion elegida ya tiene una ficha del mismo jugador
-        if (tablero[ys][xs] == jugador)
-        {
-            cout << "\nError: La posicion que elegiste ya tiene una ficha tuya." << endl;
-            continue;
-        }
-        //La posicion elegida no es una casilla jugable
-        if (tablero[ys][xs] == limite)
-        {
-            cout << "\nError: La posicion que elegiste no es una casilla jugable." << endl;
-            continue;
-        }
-        //La posicion elegida esta libre
-        else if (tablero[ys][xs] == libre)
-        {
-            tablero[ys][xs] = jugador;
-            tablero[y][x] = libre;
-            //Actualiza tablero
-            mostrarTablero();
-        }
-        //La posicion elegida tiene una ficha del jugador contrario
-        else if (tablero[ys][xs] != jugador && tablero[ys][xs] != libre && tablero[ys][xs] != limite)
-        {
-            //Elimina la ficha del jugador contrario
-            tablero[ys][xs] = jugador; 
-            tablero[y][x] = libre;
-            
-            if (jugador == blanco) 
+            if (tablero[y][x] != jugador)
             {
-                Captura_blanca++;
-            } 
-            else 
-            {
-                Captura_negra++;
+                cout << "\nError: La ficha que elegiste no es tuya o la casilla esta vacia." << endl;
+                continue; 
             }
-            mostrarTablero();
         }
-        //Evalua si alguien ganó con su ultimo movimiento
-        win = evaluarGanador();
-        if (win == true) {
-            break;
-        }
-
-        //Pregunta para rendirse
-        cout << "\n¿Prefieres rendirte? (s/n)" << endl;
-        cin >> res;
-        res = tolower(res);
-        if (res == 's') 
-        {
-            win = true;
-            cout << "\nEl jugador " << jugador << " se ha rendido." << endl;
-            continue;
-        } 
-        // Cambio de turno (solo si el movimiento fue exitoso)
-        if (jugador == blanco) 
-        {
-            jugador = negro;
-        } 
         else 
         {
-            jugador = blanco;
+            cout << "¡SALTO MULTIPLE! Debes continuar comiendo con tu ficha en (" << x << " " << y << ")" << endl;
+        }
+
+        cout << "Ingrese posicion de donde la movera (X [espacio] Y):" << endl;
+        cin >> xs >> ys;
+
+        if (tablero[ys][xs] == limite || tablero[ys][xs] == jugador) {
+            cout << "\nError: Destino invalido." << endl;
+            continue;
+        }
+
+        //vectores de movimiento
+        int difX = xs - x;
+        int difY = ys - y;
+        int vectorY = (jugador == blanco) ? -1 : 1; 
+
+        //Movimiento con distancia de 1
+        if (abs(difX) == 1 && difY == vectorY) 
+        {
+            if (turnoExtra == true) {
+                cout << "\nError: Estas obligado a hacer el salto multiple, no puedes hacer un movimiento normal." << endl;
+                continue;
+            }
+
+            if (tablero[ys][xs] == libre) 
+            {
+                tablero[ys][xs] = jugador;
+                tablero[y][x] = libre;
+                mostrarTablero();
+                turnoExtra = false; 
+            } 
+        }
+        //Movimiento con distancia de 2
+        else if (abs(difX) == 2 && difY == (vectorY * 2)) 
+        {
+            int enemigoX = x + (difX / 2);
+            int enemigoY = y + (difY / 2);
+
+            if (tablero[enemigoY][enemigoX] != libre && tablero[enemigoY][enemigoX] != limite && tablero[enemigoY][enemigoX] != jugador) 
+            {
+                tablero[ys][xs] = jugador;               
+                tablero[y][x] = libre;                   
+                tablero[enemigoY][enemigoX] = libre; 
+
+                if (jugador == blanco) Captura_blanca++;
+                else Captura_negra++;
+                
+                mostrarTablero();
+
+                // Evaluar salto múltiple
+                if (tieneSaltoDisponible(xs, ys, jugador)) 
+                {
+                    turnoExtra = true;
+                    x = xs; 
+                    y = ys; 
+                    continue;
+                }
+                else 
+                {
+                    turnoExtra = false; 
+                }
+            }
+            else 
+            {
+                cout << "\nError: No hay una ficha enemiga para saltar." << endl;
+                continue;
+            }
+        }
+        else 
+        {
+            cout << "\nError: Movimiento diagonal invalido." << endl;
+            continue;
+        }
+
+        win = evaluarGanador();
+        if (win == true) break;
+
+        // Pregunta para rendirse (solo si no estamos a mitad de un salto múltiple)
+        if (!turnoExtra) {
+            cout << "\n¿Prefieres rendirte? (s/n)" << endl;
+            cin >> res;
+            res = tolower(res);
+            if (res == 's') 
+            {
+                win = true;
+                cout << "\nEl jugador " << jugador << " se ha rendido." << endl;
+                continue;
+            } 
+
+            // Cambio de turno
+            if (jugador == blanco) 
+            {
+                jugador = negro;
+            }
+            else 
+            {
+                jugador = blanco;
+            }
         }
     }
 }
-
 
 int main()
 {
@@ -187,14 +262,13 @@ int main()
             iniciaTablero();
             mostrarTablero();
             turno();
-            evaluarGanador();
         }
-        else if (opc > 2 || opc < 1)
+        else if (opc != 2)
         {
-            cout << "Opción desconocida.";
+            cout << "Opcion desconocida.";
         }
     } 
-    cout << "\n Saliendo del juego...";
+    cout << "\n Saliendo del juego..." << endl;
 
     return 0;
 }
