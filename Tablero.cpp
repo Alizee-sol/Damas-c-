@@ -92,7 +92,7 @@ void turno()
     
     while (win == false) 
     {
-        cout << "\n--- Turno del jugador: " << jugador << " ---" << endl;
+        cout << "\n+---+---+ Turno del jugador: " << jugador << " +---+---+" << endl;
         cout << "Ingrese posicion de la ficha que va a mover (X [espacio] Y):" << endl;
         cin >> x >> y;
 
@@ -112,6 +112,12 @@ void turno()
             cout << "\nError: La posicion que elegiste ya tiene una ficha tuya." << endl;
             continue;
         }
+        //La posicion elegida no es una casilla jugable
+        if (tablero[ys][xs] == limite)
+        {
+            cout << "\nError: La posicion que elegiste no es una casilla jugable." << endl;
+            continue;
+        }
         //La posicion elegida esta libre
         else if (tablero[ys][xs] == libre)
         {
@@ -121,7 +127,7 @@ void turno()
             mostrarTablero();
         }
         //La posicion elegida tiene una ficha del jugador contrario
-        else if (tablero[ys][xs] != jugador && tablero[ys][xs] != libre)
+        else if (tablero[ys][xs] != jugador && tablero[ys][xs] != libre && tablero[ys][xs] != limite)
         {
             //Elimina la ficha del jugador contrario
             tablero[ys][xs] = jugador; 
@@ -153,7 +159,6 @@ void turno()
             cout << "\nEl jugador " << jugador << " se ha rendido." << endl;
             continue;
         } 
-
         // Cambio de turno (solo si el movimiento fue exitoso)
         if (jugador == blanco) 
         {
@@ -178,7 +183,7 @@ int main()
         cin >> opc;
         if (opc == 1)
         {
-            cout << "\n El juego ha iniciado" << endl;
+            cout << "\n +---+---+ El juego ha iniciado +---+---+" << endl;
             iniciaTablero();
             mostrarTablero();
             turno();
