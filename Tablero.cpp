@@ -54,6 +54,22 @@ void mostrarTablero()
     //Números para identificar celdas en X
     cout << "   0  1  2  3  4  5  6  7";
 }
+//Bool para que retorne true o false
+bool evaluarGanador()
+{
+    if(Captura_blanca == 12)
+    {
+        cout << "\n¡El jugador BLANCO ha ganado por capturas!" << endl;
+        return true;
+    }
+    else if(Captura_negra == 12)
+    {
+        cout << "\n¡El jugador NEGRO ha ganado por capturas!" << endl;
+        return true;
+    }
+    //Aún no hay ganador
+    return false; 
+}
 
 void turno()
 {
@@ -64,34 +80,33 @@ void turno()
     char jugador = blanco;
     //x, y = Origen // xs, ys = destino
     int x = 0, y = 0, xs = 0, ys = 0;
-    while (win = false)
+    
+    while (win == false) 
     {
-        cout << "\n Ingrese posicion de la ficha que va a mover" << endl;
+        cout << "\n--- Turno del jugador: " << jugador << " ---" << endl;
+        cout << "Ingrese posicion de la ficha que va a mover (Fila Columna):" << endl;
         cin >> x >> y;
 
         if (tablero[x][y] != jugador)
         {
-            cout << "\n la ficha que elegiste no es tuya" << endl;
-        }
-        else if (tablero[x][y] == libre)
-        {
-            cout << "\n La casilla que elegiste está vacía" << endl;
+            cout << "\nError: La ficha que elegiste no es tuya." << endl;
+            //reinicia el ciclo en caso de error
+            continue; 
         }
 
-        cout << "Ingrese posicion de donde la moverá" << endl;
+        cout << "Ingrese posicion de donde la moverá (Fila Columna):" << endl;
         cin >> xs >> ys;
 
         //La posicion elegida ya tiene una ficha del mismo jugador
         if (tablero[xs][ys] == jugador)
         {
-            cout << "\n la posicion que elegiste ya tiene una ficha tuya" << endl;
+            cout << "\nError: La posicion que elegiste ya tiene una ficha tuya." << endl;
+            continue;
         }
         //La posicion elegida esta libre
         else if (tablero[xs][ys] == libre)
         {
-            //Inserta la ficha en el lugar libre
-            tablero[xs][xs] = jugador;
-            //Elimina el valor de la celda original
+            tablero[xs][ys] = jugador;
             tablero[x][y] = libre;
             //Actualiza tablero
             mostrarTablero();
@@ -101,7 +116,8 @@ void turno()
         {
             //Elimina la ficha del jugador contrario
             tablero[xs][ys] = jugador; 
-            //Agregamos la anotacion al jugador que comió dicha ficha
+            tablero[x][y] = libre;
+            
             if (jugador == blanco) 
             {
                 Captura_blanca++;
@@ -111,9 +127,25 @@ void turno()
                 Captura_negra++;
             }
             mostrarTablero();
-
         }
-        //Cambio de turno
+        //Evalua si alguien ganó con su ultimo movimiento
+        win = evaluarGanador();
+        if (win == true) {
+            break;
+        }
+
+        //Pregunta para rendirse
+        cout << "\n¿Prefieres rendirte? (s/n)" << endl;
+        cin >> res;
+        res = tolower(res);
+        if (res == 's') 
+        {
+            win = true;
+            cout << "\nEl jugador " << jugador << " se ha rendido." << endl;
+            continue;
+        } 
+
+        // Cambio de turno (solo si el movimiento fue exitoso)
         if (jugador == blanco) 
         {
             jugador = negro;
@@ -122,37 +154,6 @@ void turno()
         {
             jugador = blanco;
         }
-
-        //Pregunta para rendirse y salir del ciclo while
-        cout << "\n ¿Prefieres rendirte? (s/n)" << endl;
-        cin >> res;
-        res = tolower(res);
-        if (res == 's') 
-        {
-            win = true;
-        } 
-        else 
-        {
-            win = false;
-        }
-
-    }
-    
-}
-
-void evaluarGanador()
-{
-    //Bool para saber si hay un ganador
-    bool ganador_blanco = false;
-    bool ganador_negro = false;
-    //Comprueva cuantas capturas tiene cada uno
-    if(Captura_blanca == 12)
-    {
-        ganador_blanco = true;
-    }
-    else if(Captura_negra == 12)
-    {
-        ganador_negro = true;
     }
 }
 
