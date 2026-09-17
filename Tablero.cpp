@@ -95,6 +95,23 @@ void evaluarCoronacion(int x, int y, char jugador)
     }
 }
 
+//dirección Y del movimiento es válida según el tipo de ficha
+bool evaluarDireccionY(char fichaMoviendose, int difY, int vectorY)
+{
+    //Si es una Dama, la dirección no importa
+    if (fichaMoviendose == dama_blanca || fichaMoviendose == dama_negra) 
+    {
+        return true; 
+    }
+    // Si es una ficha normal, si importa)
+    if (difY == vectorY || difY == (vectorY * 2))
+    {
+        return true;
+    }
+
+    return false; // Movimiento hacia atrás de una ficha normal
+}
+
 bool evaluarGanador()
 {
     if(Captura_blanca == 12)
@@ -147,6 +164,7 @@ void turno()
     //x, y = Origen // xs, ys = destino
     int x = 0, y = 0, xs = 0, ys = 0;
     bool turnoExtra = false;
+    char Dama = (jugador == blanco) ? dama_blanca : dama_negra;
     
     while (win == false) 
     {
@@ -157,7 +175,7 @@ void turno()
             cout << "Ingrese posicion de la ficha que va a mover (X [espacio] Y):" << endl;
             cin >> x >> y;
 
-            if (tablero[y][x] != jugador)
+            if (tablero[y][x] != jugador && tablero[y][x] != Dama)
             {
                 cout << "\nError: La ficha que elegiste no es tuya o la casilla esta vacia." << endl;
                 continue; 
@@ -180,9 +198,10 @@ void turno()
         int difX = xs - x;
         int difY = ys - y;
         int vectorY = (jugador == blanco) ? -1 : 1; 
+        char fichaActual = tablero[y][x];
 
         //Movimiento con distancia de 1
-        if (abs(difX) == 1 && difY == vectorY) 
+        if (abs(difX) == 1 && evaluarDireccionY(fichaActual, difY, vectorY)) 
         {
             if (turnoExtra == true) {
                 cout << "\nError: Estas obligado a hacer el salto multiple, no puedes hacer un movimiento normal." << endl;
@@ -193,13 +212,13 @@ void turno()
             {
                 tablero[ys][xs] = jugador;
                 tablero[y][x] = libre;
-                evaluarCoronacion(x,y,jugador);
+                evaluarCoronacion(xs,ys,jugador);
                 mostrarTablero();
                 turnoExtra = false; 
             } 
         }
         //Movimiento con distancia de 2
-        else if (abs(difX) == 2 && difY == (vectorY * 2)) 
+        else if (abs(difX) == 2 && evaluarDireccionY(fichaActual, difY, vectorY)) 
         {
             int enemigoX = x + (difX / 2);
             int enemigoY = y + (difY / 2);
@@ -218,7 +237,7 @@ void turno()
                 {
                     Captura_negra++; 
                 }
-                evaluarCoronacion(x,y,jugador);
+                evaluarCoronacion(xs,ys,jugador);
                 mostrarTablero();
 
                 // Evaluar salto múltiple
