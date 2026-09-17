@@ -12,6 +12,8 @@ char blanco = 'o';
 char negro = 'x';
 char libre = '-';
 char limite = ' ';
+char dama_blanca = 'O';
+char dama_negra = 'X';
 //Contadores de captura
 int Captura_blanca, Captura_negra;
 
@@ -75,6 +77,22 @@ void mostrarTablero()
     //Números para identificar celdas en X
     cout << "   0  1  2  3  4  5  6  7" << endl;
     cout << "Puntos de Blanco(o): " << Captura_blanca << " | Negro(x): " << Captura_negra << endl;
+}
+
+void evaluarCoronacion(int x, int y, char jugador)
+{
+    //si la blanca llega a la fila 0, se convierte en dama
+    if (jugador == blanco && y == 0) 
+    {
+        tablero[y][x] = dama_blanca;
+        cout << "\nEl jugador BLANCO ha coronado una Dama" << endl;
+    }
+    //si la negra llega a la fila 7, se convierte en dama
+    else if (jugador == negro && y == 7) 
+    {
+        tablero[y][x] = dama_negra;
+        cout << "\nEl jugador NEGRO ha coronado una Dama" << endl;
+    }
 }
 
 bool evaluarGanador()
@@ -175,6 +193,7 @@ void turno()
             {
                 tablero[ys][xs] = jugador;
                 tablero[y][x] = libre;
+                evaluarCoronacion(x,y,jugador);
                 mostrarTablero();
                 turnoExtra = false; 
             } 
@@ -199,6 +218,7 @@ void turno()
                 {
                     Captura_negra++; 
                 }
+                evaluarCoronacion(x,y,jugador);
                 mostrarTablero();
 
                 // Evaluar salto múltiple
