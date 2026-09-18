@@ -62,20 +62,21 @@ void iniciaTablero()
 }
 
 void mostrarTablero() 
-{  
+{
+    cout << "\n  +---+---+---+---+---+---+---+---+\n";
     //Recorrido de filas para mostrar número en Y
     for (int num = 0; num < 8; num++) 
     {
-        cout << num << " "; 
+        cout << num << " ";
         //Contenido del tablero con espacios
         for (int celda = 0; celda < 8; celda++) 
         {
-            cout << " " << tablero[num][celda] << " ";
+            cout << "| " << tablero[num][celda] << " ";
         }
-        cout << endl;
+        cout << "\n  +---+---+---+---+---+---+---+---+\n";
     }
     //Números para identificar celdas en X
-    cout << "   0  1  2  3  4  5  6  7" << endl;
+    cout << "    0   1   2   3   4   5   6   7" << endl;
     cout << "Puntos de Blanco(o): " << Captura_blanca << " | Negro(x): " << Captura_negra << endl;
 }
 
