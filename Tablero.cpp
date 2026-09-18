@@ -273,6 +273,7 @@ void turno()
         if (!turnoExtra) {
             cout << "\n¿Prefieres rendirte? (s/n)" << endl;
             cin >> res;
+            cin.ignore(10000, '\n');
             res = tolower(res);
             if (res == 's') 
             {
@@ -285,10 +286,12 @@ void turno()
             if (jugador == blanco) 
             {
                 jugador = negro;
+                Dama = dama_negra;
             }
             else 
             {
                 jugador = blanco;
+                Dama = dama_blanca;
             }
         }
     }
